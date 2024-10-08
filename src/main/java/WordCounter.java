@@ -1,14 +1,16 @@
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class WordCounter {
+    private Map<String, Integer> map = new HashMap<>();
+
     public void wordCounter(){
         try(FileInputStream fileInputStream = new FileInputStream("words.txt")){
             byte[] array = new byte[fileInputStream.available()];
             fileInputStream.read(array);
 
-            HashMap<String, Integer> map = new HashMap<>();
             String word = "";
             for (int i = 0; i < array.length; i++) {
                 if (array[i]!=13 && array[i]!=32 && array[i]!=10){
@@ -28,13 +30,16 @@ public class WordCounter {
                     else map.put(word, 1);
                 }
             }
-            for (String keys : map.keySet())
-            {
-                System.out.println(keys + " " + map.get(keys));
-            }
-
+            mapPrint();
         }catch (IOException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void mapPrint(){
+        for (String keys : map.keySet())
+        {
+            System.out.println(keys + " " + map.get(keys));
         }
     }
 

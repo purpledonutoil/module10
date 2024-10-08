@@ -1,49 +1,36 @@
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NumberFinder {
-    public void findNumbers(){
-        try(FileInputStream fileInputStream = new FileInputStream("file.txt")) {
-            byte[] array = new byte[fileInputStream.available()];
-            fileInputStream.read(array);
-            StringBuilder num = new StringBuilder();
-            for (int i = 0; i < array.length; i++) {
-                if (array[i]==40){
-                    num.append("(");
-                    i++;
-                }
-                boolean check = (array[i] > 47 && array[i] < 58);
-                int r = 0;
-                while(check){
 
-                    if((r==3 || r==7) && array[i]==45) {
-                        num.append((char) array[i]);
-                        i++;
-                        r++;
-                    }
-                    check = (array[i] > 47 && array[i] < 58);
-                    num.append((char) array[i]);
-                    r++;
-                    //System.out.println(num);
-                    if (r==12 && (array[i+1] < 47 || array[i] > 58)) {
-                        System.out.println(num);
-                        num = new StringBuilder();
-                        break;
-                    }
-                    i++;
-                    if (i==array.length) break;
-                    if (array[i]==41 && array[i+1]==32){
-                        num.append(") ");
-                        i+=2;
-                        r++;
-                    }
-                }
+    public static String readFile() {
+        StringBuilder res = new StringBuilder();
+        try (FileReader reader = new FileReader("file.txt")) {
+            int c;
+            while ((c = reader.read()) != -1) {
+                res.append((char) c);
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+        return String.valueOf(res);
     }
 
+    public void findNumbers() {
+        String text = readFile();
+        StringBuilder num = new StringBuilder();
+        String array[] = text.split("\\r");
+        Pattern pattern1 = Pattern.compile("[\\d?]?[\\d?]?[\\d?]-[\\d?]?[\\d?]?[\\d?]-[\\d?]?[\\d?]?[\\d?][\\d?]");
+        Pattern pattern2 = Pattern.compile("\\([\\d?]?[\\d?]?[\\d?]\\) [\\d?]?[\\d?]?[\\d?]-[\\d?]?[\\d?]?[\\d?][\\d?]");
+        for (int i = 0; i < array.length; i++) {
+            Matcher matcher1 = pattern1.matcher(array[i]);
+            Matcher matcher2 = pattern2.matcher(array[i]);
+            if (matcher1.find()) System.out.println(matcher1.group());
+            if (matcher2.find()) System.out.println(matcher2.group());
+        }
+    }
     public static void main(String[] args) {
         NumberFinder n = new NumberFinder();
         n.findNumbers();

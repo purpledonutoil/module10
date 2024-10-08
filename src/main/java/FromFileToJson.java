@@ -5,17 +5,23 @@ import java.io.*;
 import java.util.Arrays;
 
 public class FromFileToJson {
+    private String[] json;
+
+    private void setJsonSize(byte[] array){
+        int arraySize = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (array[i]==13) arraySize++;
+        }
+        json = new String[arraySize];
+    }
 
     public void fromFileToJson(){
-        File file = new File("user.json");
+
         try(FileInputStream fileInputStream = new FileInputStream("file.txt")) {
             byte[] array = new byte[fileInputStream.available()];
             fileInputStream.read(array);
 
-            int arraySize = 0;
-            for (int i = 0; i < array.length; i++) {
-                if (array[i]==13) arraySize++;
-            }
+            setJsonSize(array);
 
             int i = 0;
             while (array[i]!=10) {
@@ -24,7 +30,6 @@ public class FromFileToJson {
             i++;
 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String[] json = new String[arraySize];
             String[] words = new String[2];
             String word = "";
             int size = 0;
@@ -42,15 +47,19 @@ public class FromFileToJson {
                     json[size] = gson.toJson(person);
                     size++;
                 }
-                try (FileWriter writer = new FileWriter(file))
-                {
-                    writer.write(Arrays.toString(json));
-                    writer.flush();
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
+                jsonWrite();
             }
 
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void jsonWrite(){
+        try (FileWriter writer = new FileWriter("user.json"))
+        {
+            writer.write(Arrays.toString(json));
+            writer.flush();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
